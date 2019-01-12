@@ -14,20 +14,19 @@
 Route::get('/', function () {
     return view('welcome');
 });
+/*getページ開くという意味　/はtopページ　
+viewフォルダの中のwelcomeというファイルを開く
+groupはurlをまとめるという意味*/
 
 Route::group(['prefix' => 'admin'], function() {
     Route::get('news/create', 'Admin\NewsController@add');
+    Route::get('profile/edit', 'Admin\ProfileController@edit');
 });
 //1/11課題分
 /*3.「http://XXXXXX.jp/XXX というアクセスが来たときに、
  AAAControllerのbbbというAction に渡すRoutingの設定」を書いてみてください。*/
-Route::group(['prefix' => 'XXX'], function() {
-    Route::get('user/profile', 'bbb\AAAController@add');
-});
+    //Route::get('XXX', 'AAAController@bbb');//
 
 /*【応用】 前章でAdmin/ProfileControllerを作成し、edit Actionを追加しました。
  web.phpを編集してadmin/profile/edit にアクセスしたら ProfileController の edit Action
  に割り当てるように設定してください。*/
-Route::group(['prefix' => 'admin'], function() {
-  Route::get('profile/edit', 'Admin\ProfileController@add');
-});
