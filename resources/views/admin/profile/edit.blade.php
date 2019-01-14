@@ -1,5 +1,5 @@
 {{-- layouts/profile.blade.phpを読み込む --}}
-@extends('layouts.admin')
+@extends('layouts.profile')
 
 
 {{-- profile.blade.phpの@yield('title')に'私のプロフィール'を埋め込む --}}
