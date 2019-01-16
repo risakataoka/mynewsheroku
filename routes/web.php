@@ -21,6 +21,9 @@ groupはurlをまとめるという意味*/
 Route::group(['prefix' => 'admin'], function() {
     Route::get('news/create', 'Admin\NewsController@add');
     Route::get('profile/edit', 'Admin\ProfileController@edit');
+    Route::get('news/create', 'Admin\NewsController@add')->middleware('auth');
+    Route::get('profile/edit', 'Admin\ProfileController@edit')->middleware('auth');
+    Route::post('news/create', 'Admin\NewsController@create')->middleware('auth');
 });
 //1/11課題分
 /*3.「http://XXXXXX.jp/XXX というアクセスが来たときに、
@@ -30,3 +33,7 @@ Route::group(['prefix' => 'admin'], function() {
 /*【応用】 前章でAdmin/ProfileControllerを作成し、edit Actionを追加しました。
  web.phpを編集してadmin/profile/edit にアクセスしたら ProfileController の edit Action
  に割り当てるように設定してください。*/
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
