@@ -31,8 +31,9 @@ Route::group(['prefix' => 'admin'], function() {
     Route::get('profile/edit', 'Admin\ProfileController@edit')->middleware('auth');
     Route::post('profile/edit', 'Admin\ProfileController@update')->middleware('auth');
     Route::get('profile', 'Admin\ProfileController@index')->middleware('auth');
-    Route::get('news/doedit', 'Admin\ProfileController@doedit')->middleware('auth'); // 追記
-    Route::post('news/doedit', 'Admin\ProfileController@doupdate')->middleware('auth'); // 追記
+    Route::get('profile/doedit', 'Admin\ProfileController@doedit')->middleware('auth'); // 追記
+    Route::post('profile/doedit', 'Admin\ProfileController@doupdate')->middleware('auth'); // 追記
+    Route::get('profile/delete', 'Admin\ProfileController@delete')->middleware('auth');
 });
 //1/11課題分
 /*3.「http://XXXXXX.jp/XXX というアクセスが来たときに、
