@@ -28,26 +28,12 @@ class NewsController extends Controller
 
       // formに画像があれば、保存する
       if (isset($form['image'])) {
-        $path = $request->file('image')->store('public/image');
+        $path = $result['ObjectURL'];
         $news->image_path = basename($path);
       } else {
           $news->image_path = null;
       }
-      // 画像保存
-      if (isset($news_form['image'])) {
-      $result = $s3client->putObject([
-      'ACL' => 'public-read',
-      'Bucket' => $bucket,
-      'Key' => $new_filename,
-      'Body' => $image,
-      'ContentType' => mime_content_type($_FILES['img_path']['tmp_name']),
-      ]);
 
-      //読み取り用のパスを返す
-      $path = $result['ObjectURL'];
-      $news->image_path = basename($path);
-      unset($news_form['image']);
-      }
       unset($form['_token']);
       unset($form['image']);
       // データベースに保存する
