@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Aws\S3\S3Client;
 
 use App\News;
 
@@ -26,9 +27,11 @@ class NewsController extends Controller
       $news = new News;
       $form = $request->all();
 
+
+
       // formに画像があれば、保存する
       if (isset($form['image'])) {
-        $path = $result['ObjectURL'];
+        $path =  $this->upload($request);
         $news->image_path = basename($path);
       } else {
           $news->image_path = null;
@@ -64,17 +67,19 @@ class NewsController extends Controller
   }
 
 
-  public function upload(Request $request,int $id)
-{
+  public function upload(Request $request)
+  {
     //拡張子で画像でないファイルをはじく
-    $ext = substr($filename, strrpos($_FILES['img_path']['name'], '.') + 1);
+    $ext = substr($_FILES['image']['name'], strrpos($_FILES['image']['name'], '.') + 1);
     if(strtolower($ext) !== 'png' && strtolower($ext) !== 'jpg' && strtolower($ext) !== 'gif'){
-        echo '画像以外のファイルが指定されています。画像ファイル(png/jpg/jpeg/gif)を指定して下さい';
+    echo '画像以外のファイルが指定されています。画像ファイル(png/jpg/jpeg/gif)を指定して下さい';
+    echo $_FILES['image']['name'];
+    echo $ext;
         exit();
     }
     //読み込みの際のキーとなるS3上のファイルパスを作る(作り方は色々あると思います)
-    $tmpname = str_replace('/tmp/','',$_FILES['img_path']['tmp_name']);
-    $new_filename = 'profiles/'.$id.'-'.time().'-'.$tmpname.'.'.$ext;
+    $tmpname = str_replace('/tmp/','',$_FILES['image']['tmp_name']);
+    $new_filename = 'profiles/'.time().'-'.$tmpname.'.'.$ext;
 
     //S3clientのインスタンス生成(各項目の説明は後述)
     $s3client = S3Client::factory([
@@ -88,7 +93,7 @@ class NewsController extends Controller
     //バケット名を指定
     $bucket = getenv('S3_BUCKET_NAME')?: die('No "S3_BUCKET_NAME" config var in found in env!');
     //アップロードするファイルを用意
-    $image = fopen($_FILES['img_path']['tmp_name'],'rb');
+    $image = fopen($_FILES['image']['tmp_name'],'rb');
 
     //画像のアップロード(各項目の説明は後述)
     $result = $s3client->putObject([
@@ -96,23 +101,23 @@ class NewsController extends Controller
         'Bucket' => $bucket,
         'Key' => $new_filename,
         'Body' => $image,
-        'ContentType' => mime_content_type($_FILES['img_path']['tmp_name']),
+        'ContentType' => mime_content_type($_FILES['image']['tmp_name']),
     ]);
 
     //読み取り用のパスを返す
     $path = $result['ObjectURL'];
-
+    return $path;
     //パスをDBに保存(ここの詳細処理は今回は記述しません)
-    $this->userRepository->updateUserProfsById($id, 'img_path', $path);
-}
+    //$this->userRepository->updateUserProfsById($id, 'img_path', $path);
+   }
 
   // 以下を追記　　
   public function delete(Request $request)
   {
-      // 該当するNews Modelを取得
+     // 該当するNews Modelを取得
       $news = News::find($request->id);
       // 削除する
       $news->delete();
       return redirect('admin/news/');
+    }
   }
-}
